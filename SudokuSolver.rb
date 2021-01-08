@@ -31,6 +31,33 @@ class SudokuSolver
     end
   end
 
+  def deep_solve
+    stack = []
+    stack << @field.join
+
+    field = loop do
+      break nil if (field = stack.pop).nil?
+      break field if (idx = field.index("0")).nil?
+      list = simulate(field)
+      next if list.empty?
+      stack << list
+      stack.flatten!
+    end
+    return field
+  end
+
+  def simulate(str)
+    @field = str.delete("\n").split("").map(&:to_i)
+    idx = @field.index(0)
+    c = list_candidates(idx)
+    list = []
+    c.each do |v|
+      @field[idx] = v
+      list << @field.join.dup
+    end
+    return list
+  end
+
   def list_candidates(idx)
     indexes = []
     indexes << row_indexes(idx)
@@ -82,16 +109,17 @@ if __FILE__ == $0 then
   masao.display
 
   masao.basic_solve
-  masao.display
+  field = masao.deep_solve
+  masao.display(field) if field
 end
 
 __END__
-123456789
-456789123
-789123456
-312645978
-645978312
-978312645
-231564897
-564897000
-000000000
+100009004
+800652070
+000000600
+760000000
+090000050
+010000026
+004000700
+050306000
+300004001
